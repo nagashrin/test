@@ -10,14 +10,14 @@ from statistics import mode
 import numpy as np
 import os
 import fnmatch
-#PATH = os.getcwd() + "/"
+PATH = os.getcwd() + "/data/"
 
 # get the .csv file from the directory
 
 def get_csv_file(city):
-    for file in os.listdir( os.getcwd()):
+    for file in os.listdir( PATH):
         if fnmatch.fnmatch(file, city + '.csv'): return 1
-
+    return 0
 # Convert .csv file to pandas dataframe
 # Insert columns: Start Day, Start Month & Full Trip 
 
@@ -25,9 +25,9 @@ def load_file(city):
     data_file_found = get_csv_file(city)
     
     if data_file_found > 0:
-        #data_file_path = PATH+city+".csv"
+        data_file_path = PATH+city+".csv"
         #data_file_path = "./"+city+".csv"
-        city_csv_to_df = pd.read_csv('./chicago.csv') #pd.read_csv(data_file_path)
+        city_csv_to_df = pd.read_csv(data_file_path) #pd.read_csv(data_file_path)
         df = pd.DataFrame(city_csv_to_df)
         df.iloc[:,1:3] = df.iloc[:,1:3].apply(pd.to_datetime, errors = 'coerce')
         df['Start Day'] = df['Start Time'].dt.weekday_name
@@ -140,12 +140,6 @@ def get_day():
             print('You have selected {}'.format(day))
             return day
         
- # Visualization input       
-        quit = input('\nDo you want to check out some cool charts? Y/N: ')
-        if quit.lower() == 'n':
-            print("Thanks for visiting us")
-        else:
-            show_bikeshare_charts(city_data)
 def get_insights(city, time_period, month, day):
     
     if city == "new york":
@@ -224,6 +218,8 @@ def show_bikeshare_charts(city_data):
 
 def main():
     none = ''
+    day = ''
+    month = 0
     city = get_city()
     time_period = get_time_period().lower()
     
@@ -239,7 +235,13 @@ def main():
     print('Calculating....')
     
     if (len(city) > 0): #and len(time_period) > 0 and  month > 0 and len(day) > 0):
-        city_data = get_insights(city, time_period=none, month=0, day=none)
+        city_data = get_insights(city, time_period, month, day)
         show_data_points_non_visual(city_data)
+        # Visualization input       
+        quit = input('\nDo you want to check out some cool charts? Y/N: ')
+        if quit.lower() == 'n':
+            print("Thanks for visiting us")
+        else:
+            show_bikeshare_charts(city_data)
 
 main()
