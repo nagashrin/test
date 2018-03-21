@@ -7,20 +7,20 @@ import math
 import pandas as pd
 from datetime import datetime
 from statistics import mode
+from operator import itemgetter
 import numpy as np
 import os
 import fnmatch
 PATH = os.getcwd() + "/data/"
 
 # get the .csv file from the directory
-
 def get_csv_file(city):
     for file in os.listdir( PATH):
         if fnmatch.fnmatch(file, city + '.csv'): return 1
     return 0
+
 # Convert .csv file to pandas dataframe
 # Insert columns: Start Day, Start Month & Full Trip 
-
 def load_file(city):
     data_file_found = get_csv_file(city)
     
@@ -37,9 +37,9 @@ def load_file(city):
     else:
         print("We currently do not have data for the city that you requested")
         return -1
-# Ask user for the city. If the input does not match the list of cities, a quit option is given after 3 failed attempts.
-def get_city():
     
+# Ask user for the city. If the input does not match the list of cities, a quit option is given after 3 failed attempts.
+def get_city():   
     i = 0
     lst = ['chicago', 'new york', 'washington']
     
@@ -162,19 +162,49 @@ def show_data_points_non_visual(city_data):
     #city_data = get_insights(city, time_period, month, day)
    
     # Print Data Analysis
-    print('Most Popular Trip for your filter is: {}'.format(str(city_data['Full Trip'].mode())))  
-    print('Most Popular Hour for your filter is: {}:00'.format(int(city_data['Start Time'].dt.hour.mode())))
-    print('Most Popular Day for your City is: {}'.format(str(city_data['Start Time'].dt.weekday_name.mode()))) 
-    print('Total Trip Duration for your filter is: {}'.format((city_data['Trip Duration'].cumsum(axis = 0)).iloc[-1]))  
-    print('Average Trip Duration for your filter is {}'.format((city_data['Trip Duration'].cumsum(axis = 0)).iloc[-1]/(len(city_data['Trip Duration']))))
-   
+    # Most popular day
+    print('• Most Popular Day for ridership in your City is: {}\n'.format(str(city_data['Start Time'].dt.weekday_name.mode().iloc[0])))
+    print(start-end)
+    # Most popular hour
+    print('• Most Popular Hour for your filter is: {}:00\n'.format(int(city_data['Start Time'].dt.hour.mode())))
+    # Total trip duration
+    print('• Total Trip Duration for your filter is: {}\n'.format((city_data['Trip Duration'].cumsum(axis = 0)).iloc[-1]))
+    # AverageS trip duration
+    print('• Average Trip Duration for your filter is {}\n'.format((city_data['Trip Duration'].cumsum(axis = 0)).iloc[-1]/(len(city_data['Trip Duration']))))
+    # Most popular trip
+    print('• Most Popular Trip for your filter is:{} seconds\n\t'.format(str(city_data['Full Trip'].mode().iloc[0])))
+       
+    # Most popular start station
+    station = dict(city_data.groupby('Start Station').size())
+    max_start_station = max(station.items(), key=itemgetter(1))#[0]
+    print("• Most popular Start Station is : {}\n ".format(max_start_station[0]))
+    
+    # Most popular end station
+    station = dict(city_data.groupby('End Station').size())
+    max_end_station = max(station.items(), key=itemgetter(1))#[0]
+    print("• Most popular End Station is : {}\n ".format(max_end_station[0]))
+    
+    # User Type breakdown
+    usertype = dict(city_data.groupby('User Type').size())
+    usertype_lists = sorted(usertype.items())
+    print("• User Type Breakdown is: {}, {}\n".format(usertype_lists[0], usertype_lists[1]))
+    
+    # Gender breakdown
+    if 'Gender' in city_data:
+        gender = dict(city_data.groupby('Gender').size())
+        gender_lists = sorted(gender.items())
+        print("• Gender Breakdown is: {}, {}\n".format(gender_lists[0], gender_lists[1]))
+        
+    
+   # Birth Year
     if 'Birth Year' in city_data:
-        print('Popular Birth Year for your filter is: {}'.format(int(city_data['Birth Year'].mode())))
-        print('Youngest person birth year is: {}'.format(int(city_data['Birth Year'].max())))
-        print('Oldest person birth year is: {}'.format(int(city_data['Birth Year'].min())))
+        print('• Popular Birth Year for your filter is: {}\n'.format(int(city_data['Birth Year'].mode())))
+        print('• Youngest person birth year is: {}\n'.format(int(city_data['Birth Year'].max())))
+        print('• Oldest person birth year is: {}\n'.format(int(city_data['Birth Year'].min())))
     else:
-        print("The City data does not include birth year data")
+        print("• The City data does not include birth year data\n")
     return 1
+'''
 # Visualizations
 def show_bikeshare_charts(city_data):
 
@@ -215,7 +245,7 @@ def show_bikeshare_charts(city_data):
         for p in ax.patches:
             ax.text(p.get_x() + p.get_width()/2., p.get_height(),'%d' % int(p.get_height()), fontsize=12, ha='center',va='bottom')
         plt.show()
-
+'''
 def main():
     none = ''
     day = ''
@@ -232,16 +262,19 @@ def main():
     elif time_period == 'day':
         day = get_day()
 
-    print('Calculating....')
+    print('Calculating....\n')
+
     
     if (len(city) > 0): #and len(time_period) > 0 and  month > 0 and len(day) > 0):
         city_data = get_insights(city, time_period, month, day)
         show_data_points_non_visual(city_data)
+'''        
         # Visualization input       
         quit = input('\nDo you want to check out some cool charts? Y/N: ')
         if quit.lower() == 'n':
             print("Thanks for visiting us")
         else:
             show_bikeshare_charts(city_data)
+'''            
 
 main()
