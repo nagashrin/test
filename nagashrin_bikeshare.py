@@ -10,24 +10,26 @@ from statistics import mode
 import numpy as np
 import os
 import fnmatch
-#PATH = os.getcwd() + "/"
+PATH = os.getcwd() + "/"
 
 # get the .csv file from the directory
 
 def get_csv_file(city):
     for file in os.listdir( os.getcwd()):
-        if fnmatch.fnmatch(file, city + '.csv'): return 1
+        if fnmatch.fnmatch(file, city + '.csv'):
+            return 1
 
 # Convert .csv file to pandas dataframe
 # Insert columns: Start Day, Start Month & Full Trip 
 
 def load_file(city):
+
     data_file_found = get_csv_file(city)
     
     if data_file_found > 0:
         data_file_path = PATH+city+".csv"
         #data_file_path = "./"+city+".csv"
-        city_csv_to_df = pd.read_csv('data_file_path') #pd.read_csv(data_file_path)
+        city_csv_to_df = pd.read_csv(data_file_path) #pd.read_csv(data_file_path)
         df = pd.DataFrame(city_csv_to_df)
         df["Start Time"] = pd.to_datetime(df["Start Time"],infer_datetime_format=True )
         df["End Time"] = pd.to_datetime(df["End Time"],infer_datetime_format=True )
